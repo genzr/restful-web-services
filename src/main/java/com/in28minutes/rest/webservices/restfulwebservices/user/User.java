@@ -1,12 +1,12 @@
 package com.in28minutes.rest.webservices.restfulwebservices.user;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class User {
 
     private Integer id;
     private String name;
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Override
     public String toString() {
@@ -17,7 +17,7 @@ public class User {
                 '}';
     }
 
-    public User(Integer id, String name, Date birthDate) {
+    public User(Integer id, String name, LocalDate birthDate) {
         this.id = id;
         this.name = name;
         this.birthDate = birthDate;
@@ -39,11 +39,11 @@ public class User {
         this.name = name;
     }
 
-    public Date getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 }

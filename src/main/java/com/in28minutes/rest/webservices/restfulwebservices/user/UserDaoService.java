@@ -2,8 +2,8 @@ package com.in28minutes.rest.webservices.restfulwebservices.user;
 
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -12,9 +12,9 @@ public class UserDaoService {
     private static int usersCount = 3;
 
     static {
-        users.add(new User(1, "Adam", new Date()));
-        users.add(new User(2, "Eve", new Date()));
-        users.add(new User(3, "Jack", new Date()));
+        users.add(new User(1, "Adam", LocalDate.now()));
+        users.add(new User(2, "Eve", LocalDate.now()));
+        users.add(new User(3, "Jack", LocalDate.now()));
     }
 
     public List<User> findAll(){
