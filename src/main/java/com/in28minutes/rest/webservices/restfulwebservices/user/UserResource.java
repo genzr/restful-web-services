@@ -17,23 +17,27 @@ public class UserResource {
 
     //retrieveAllUsers
     @GetMapping("/users")
-    public List<User> retrieveAllUsers() {
-        return service.findAll();
+    public ResponseEntity<List<User>> retrieveAllUsers() {
+        List<User> allUsers = service.findAll();
+
+        if(allUsers.size() <= 0) {
+            throw new UserNotFoundException("No users found");
+        }
+        return ResponseEntity.ok(allUsers);
     }
 
     //retrieveUserById
     @GetMapping("users/{id}")
-    public User retriveUser(@PathVariable int id) {
+    public ResponseEntity<User> retrieveUser(@PathVariable int id) {
         User user = service.findOne(id);
+
         if(user == null) {
             throw new UserNotFoundException("id: " + id);
         }
-        return user;
+
+        return ResponseEntity.ok(user);
     }
 
-    //CREATED
-    // input - details of user
-    // output - CREATED & Return the created URI
     @PostMapping("/users")
     public ResponseEntity<Object> createUser(@RequestBody User user) {
         User savedUser = service.save(user);
@@ -45,7 +49,23 @@ public class UserResource {
                 .toUri();
 
         return ResponseEntity.created(newLocation).build();
-
     }
+
+        @DeleteMapping("/users/{id}")
+        public ResponseEntity<Object> deleteUser(@PathVariable int id) {
+
+            User user = service.findOne(id);
+
+            if(user == null) {
+                throw new UserNotFoundException("id: " + id);
+            }
+
+            boolean deleted = service.delete(id);
+            if(deleted) {
+                return ResponseEntity.ok().build();
+            }
+
+            return ResponseEntity.badRequest().build();
+        }
 
 }
