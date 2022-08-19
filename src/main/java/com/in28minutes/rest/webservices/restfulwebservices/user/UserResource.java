@@ -50,30 +50,24 @@ public class UserResource {
     @PostMapping("/users")
     public ResponseEntity<Object> createUser(@RequestBody @Valid User user) {
         User savedUser = service.save(user);
-
         URI newLocation = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedUser.getId())
                 .toUri();
-
         return ResponseEntity.created(newLocation).build();
     }
 
         @DeleteMapping("/users/{id}")
         public ResponseEntity<Object> deleteUser(@PathVariable int id) {
-
             User user = service.findOne(id);
-
             if(user == null) {
                 throw new UserNotFoundException("id: " + id);
             }
-
             boolean deleted = service.delete(id);
             if(deleted) {
                 return ResponseEntity.ok().build();
             }
-
             return ResponseEntity.badRequest().build();
         }
 
