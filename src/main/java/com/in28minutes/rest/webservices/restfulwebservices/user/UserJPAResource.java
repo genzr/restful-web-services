@@ -11,19 +11,21 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-public class UserResource {
+public class UserJPAResource {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private UserDaoService service;
 
-
-
     //retrieveAllUsers
-    @GetMapping("/users")
+    @GetMapping("/jpa/users")
     public ResponseEntity<List<User>> retrieveAllUsers() {
-        List<User> allUsers = service.findAll();
+        List<User> allUsers = userRepository.findAll();
 
         if(allUsers.size() <= 0) {
             throw new UserNotFoundException("No users found");
@@ -32,15 +34,15 @@ public class UserResource {
     }
 
     //retrieveUserById
-    @GetMapping("users/{id}")
+    @GetMapping("/jpa/users/{id}")
     public EntityModel<User> retrieveUser(@PathVariable int id) {
-        User user = service.findOne(id);
+        Optional<User> user = userRepository.findById(id);
 
-        if(user == null) {
+        if(!user.isPresent()) {
             throw new UserNotFoundException("id: " + id);
         }
 
-        EntityModel<User> model = EntityModel.of(user);
+        EntityModel<User> model = EntityModel.of(user.get());
         WebMvcLinkBuilder linkToUsers = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
         WebMvcLinkBuilder linkToSelf = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveUser(id));
         model.add(linkToUsers.withRel("all-users"));
@@ -49,9 +51,9 @@ public class UserResource {
         return model;
     }
 
-    @PostMapping("/users")
+    @PostMapping("/jpa/users")
     public ResponseEntity<Object> createUser(@RequestBody @Valid User user) {
-        User savedUser = service.save(user);
+        User savedUser = userRepository.save(user);
         URI newLocation = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -60,17 +62,14 @@ public class UserResource {
         return ResponseEntity.created(newLocation).build();
     }
 
-        @DeleteMapping("/users/{id}")
+        @DeleteMapping("/jpa/users/{id}")
         public ResponseEntity<Object> deleteUser(@PathVariable int id) {
-            User user = service.findOne(id);
-            if(user == null) {
+            Optional<User> user = userRepository.findById(id);
+            if(!user.isPresent()) {
                 throw new UserNotFoundException("id: " + id);
             }
-            boolean deleted = service.delete(id);
-            if(deleted) {
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.badRequest().build();
+            userRepository.deleteById(id);
+            return ResponseEntity.ok().build();
         }
 
 }
